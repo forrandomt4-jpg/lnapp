@@ -1,0 +1,8 @@
+{
+  "name": "LectureNow",
+  "description": "Real-time timetable, live countdown, CP1/CP2/CP3 batch schedule, NFC room routing, and admin updates for Computer Engineering Semester 3.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

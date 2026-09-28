@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Student {
+  id               Int      @id @default(autoincrement())
+  enrollmentNumber String   @unique
+  name             String
+  branch           String   // e.g., "Computer Engineering"
+  semester         Int      // e.g., 3
+  batch            String   // e.g., "CP1", "CP2", "CP3"
+}
+
+model TimetableEntry {
+  id          Int      @id @default(autoincrement())
+  batch       String   // "CP1", "CP2", "CP3", or "ALL"
+  subject     String
+  faculty     String?  // nullable for SL/LIB
+  classroom   String?  // nullable for SL/LIB
+  dayOfWeek   Int      // 1 (Monday) to 6 (Saturday)
+  startTime   String   // format "HH:MM", e.g., "10:30"
+  endTime     String   // format "HH:MM", e.g., "11:30"
+}
+
+model TimetableChange {
+  id          Int      @id @default(autoincrement())
+  batch       String
+  date        String   // YYYY-MM-DD
+  startTime   String
+  endTime     String
+  subject     String?
+  faculty     String?
+  classroom   String?
+  isCancelled Boolean  @default(false)
+}

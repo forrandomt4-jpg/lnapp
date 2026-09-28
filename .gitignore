@@ -1,0 +1,24 @@
+*.iml
+.gradle/
+.kotlin/
+local.properties
+/local.properties
+.idea/
+.DS_Store
+build/
+/build
+app/build/
+/captures
+.externalNativeBuild
+.cxx
+.env
+debug.keystore
+
+# Built binaries & packages
+*.apk
+*.aab
+node_modules/
+dist/
+
+# Root test screenshots
+/*.png

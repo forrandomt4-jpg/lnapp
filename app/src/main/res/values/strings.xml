@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LectureNow</string>
+    <string name="widget_name">LectureNow Live Widget</string>
+    <string name="widget_description">Shows ongoing and upcoming lectures with live countdowns</string>
+</resources>

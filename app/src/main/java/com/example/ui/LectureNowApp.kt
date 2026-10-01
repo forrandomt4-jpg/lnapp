@@ -1,6 +1,5 @@
 package com.example.ui
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,11 +28,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import com.example.ui.components.AdminView
 import com.example.ui.components.FullTimetableView
 import com.example.ui.components.HeroCurrentLectureCard
@@ -49,6 +52,7 @@ fun LectureNowApp(
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(state.notificationMessage) {
         state.notificationMessage?.let {
@@ -68,6 +72,38 @@ fun LectureNowApp(
         return
     }
 
+    val pagerState = rememberPagerState(
+        initialPage = when (state.activeTab) {
+            NavTab.DASHBOARD -> 0
+            NavTab.TIMETABLE -> 1
+            NavTab.ADMIN -> 2
+        }
+    ) { 3 }
+
+    // Synchronize swipe gesture with ViewModel tab state
+    LaunchedEffect(pagerState.currentPage) {
+        val targetTab = when (pagerState.currentPage) {
+            0 -> NavTab.DASHBOARD
+            1 -> NavTab.TIMETABLE
+            else -> NavTab.ADMIN
+        }
+        if (state.activeTab != targetTab) {
+            viewModel.setNavTab(targetTab)
+        }
+    }
+
+    // Synchronize ViewModel tab changes to pager
+    LaunchedEffect(state.activeTab) {
+        val targetPage = when (state.activeTab) {
+            NavTab.DASHBOARD -> 0
+            NavTab.TIMETABLE -> 1
+            NavTab.ADMIN -> 2
+        }
+        if (pagerState.currentPage != targetPage) {
+            pagerState.animateScrollToPage(targetPage)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBarComponent(
@@ -84,22 +120,28 @@ fun LectureNowApp(
                 modifier = Modifier.testTag("main_bottom_nav")
             ) {
                 NavigationBarItem(
-                    selected = state.activeTab == NavTab.DASHBOARD,
-                    onClick = { viewModel.setNavTab(NavTab.DASHBOARD) },
+                    selected = pagerState.currentPage == 0,
+                    onClick = {
+                        coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                    },
                     icon = { Icon(Icons.Default.Today, contentDescription = "Live Today") },
                     label = { Text("Live Today") },
                     modifier = Modifier.testTag("nav_tab_dashboard")
                 )
                 NavigationBarItem(
-                    selected = state.activeTab == NavTab.TIMETABLE,
-                    onClick = { viewModel.setNavTab(NavTab.TIMETABLE) },
+                    selected = pagerState.currentPage == 1,
+                    onClick = {
+                        coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                    },
                     icon = { Icon(Icons.Default.CalendarMonth, contentDescription = "Timetable") },
                     label = { Text("Timetable") },
                     modifier = Modifier.testTag("nav_tab_timetable")
                 )
                 NavigationBarItem(
-                    selected = state.activeTab == NavTab.ADMIN,
-                    onClick = { viewModel.setNavTab(NavTab.ADMIN) },
+                    selected = pagerState.currentPage == 2,
+                    onClick = {
+                        coroutineScope.launch { pagerState.animateScrollToPage(2) }
+                    },
                     icon = { Icon(Icons.Default.AdminPanelSettings, contentDescription = "Admin") },
                     label = { Text("Admin") },
                     modifier = Modifier.testTag("nav_tab_admin")
@@ -115,12 +157,12 @@ fun LectureNowApp(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Crossfade(
-                targetState = state.activeTab,
-                label = "TabCrossfade"
-            ) { tab ->
-                when (tab) {
-                    NavTab.DASHBOARD -> {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -144,7 +186,7 @@ fun LectureNowApp(
                         }
                     }
 
-                    NavTab.TIMETABLE -> {
+                    1 -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -165,7 +207,7 @@ fun LectureNowApp(
                         }
                     }
 
-                    NavTab.ADMIN -> {
+                    2 -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -188,7 +230,7 @@ fun LectureNowApp(
             }
         }
 
-        // Student Profile & Switch Modal Dialog
+        // Student Profile Modal Dialog
         if (state.showEnrollDialog) {
             StudentEnrollmentDialog(
                 currentStudent = state.currentStudent,
@@ -200,7 +242,7 @@ fun LectureNowApp(
             )
         }
 
-        // Time Machine / Simulator Dialog (allows simulating any weekday/period)
+        // Time Machine / Simulator Dialog
         if (state.showTimeMachineDialog) {
             TimeMachineDialog(
                 timeState = state.timeState,

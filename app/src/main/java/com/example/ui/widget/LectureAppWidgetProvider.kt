@@ -100,7 +100,7 @@ class LectureAppWidgetProvider : AppWidgetProvider() {
 
                     views.setTextViewText(R.id.widget_subject_room, "${next.subject.shortName} • Room ${next.effectiveClassroom.code}")
                     views.setTextViewText(R.id.widget_time_countdown, "Starts at ${next.slot.startTime} • Faculty: ${next.effectiveFaculty.shortCode}")
-                    views.setTextViewText(R.id.widget_next_sneak_peek, "Starts in ${next.formattedUntilStart}")
+                    views.setTextViewText(R.id.widget_next_sneak_peek, "Scheduled in Room ${next.effectiveClassroom.code} (${next.effectiveClassroom.name})")
                 }
 
                 // 3. Upcoming Further Out (>10 minutes) -> Static Cyan countdown
@@ -118,7 +118,7 @@ class LectureAppWidgetProvider : AppWidgetProvider() {
 
                     views.setTextViewText(R.id.widget_subject_room, "${next.subject.shortName} • Room ${next.effectiveClassroom.code}")
                     views.setTextViewText(R.id.widget_time_countdown, "Starts at ${next.slot.startTime} • Faculty: ${next.effectiveFaculty.shortCode}")
-                    views.setTextViewText(R.id.widget_next_sneak_peek, "Starts in ${next.formattedUntilStart}")
+                    views.setTextViewText(R.id.widget_next_sneak_peek, "Scheduled in Room ${next.effectiveClassroom.code} (${next.effectiveClassroom.name})")
                 }
 
                 // 4. Breaks / Day Completed / Sunday / Other
@@ -172,7 +172,7 @@ class LectureAppWidgetProvider : AppWidgetProvider() {
                     if (next != null) {
                         views.setTextViewText(R.id.widget_subject_room, "Next: ${next.subject.shortName} • Room ${next.effectiveClassroom.code}")
                         views.setTextViewText(R.id.widget_time_countdown, "${next.slot.day.shortName} at ${next.slot.startTime} (${next.effectiveFaculty.shortCode})")
-                        views.setTextViewText(R.id.widget_next_sneak_peek, "Starts in ${next.formattedUntilStart}")
+                        views.setTextViewText(R.id.widget_next_sneak_peek, "Room ${next.effectiveClassroom.code} • ${next.effectiveClassroom.name}")
                     } else {
                         views.setTextViewText(R.id.widget_subject_room, "No classes in progress")
                         views.setTextViewText(R.id.widget_time_countdown, "Check Timetable for upcoming sessions")

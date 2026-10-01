@@ -1,7 +1,9 @@
 package com.example.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,16 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -55,44 +53,62 @@ fun TodayTimelineView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "${effectiveDay.displayName}'s Schedule",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Column {
+                Text(
+                    text = "${effectiveDay.displayName}'s Schedule",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 18.sp
+                    ),
+                    color = Color(0xFF0F172A)
+                )
+                Text(
+                    text = if (todaySchedule.isNotEmpty()) "${todaySchedule.size} sessions scheduled" else "No sessions",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF64748B)
+                )
+            }
 
-            Text(
-                text = "${todaySchedule.size} Classes",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        if (todaySchedule.isEmpty()) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                color = Color(0xFFF1F5F9)
+            ) {
+                Text(
+                    text = effectiveDay.shortName.uppercase(),
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = Color(0xFF334155),
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        if (todaySchedule.isEmpty()) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(28.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (effectiveDay == DayOfWeek.SUNDAY) "Sunday is an academic rest day. No classes scheduled today." else "No classes scheduled for ${effectiveDay.displayName}",
+                        text = if (effectiveDay == DayOfWeek.SUNDAY)
+                            "Sunday is an academic rest day. No lectures scheduled."
+                        else "No classes scheduled for ${effectiveDay.displayName}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF64748B)
                     )
                 }
             }
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                todaySchedule.forEach { lecture ->
+                todaySchedule.forEachIndexed { index, lecture ->
                     TimelineSlotCard(
                         lecture = lecture,
                         onSlotRoomClick = onSlotRoomClick
@@ -113,15 +129,9 @@ fun TimelineSlotCard(
     val isCancelled = lecture.isCancelled
 
     val containerColor = when {
-        isOngoing -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-        isCompleted -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-        isCancelled -> Color(0xFFEF4444).copy(alpha = 0.1f)
-        else -> MaterialTheme.colorScheme.surface
-    }
-
-    val borderColor = when {
-        isOngoing -> MaterialTheme.colorScheme.primary
-        else -> Color.Transparent
+        isOngoing -> Color(0xFFF0FDF4) // Soft mint green for live
+        isCancelled -> Color(0xFFFEF2F2)
+        else -> Color.White
     }
 
     Card(
@@ -131,20 +141,17 @@ fun TimelineSlotCard(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("slot_item_${lecture.slot.id}")
-            .then(
-                if (isOngoing) Modifier.border(2.dp, borderColor, RoundedCornerShape(16.dp))
-                else Modifier
-            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp)
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Time column with vertical indicator
+            // Time Indicator (Clean Horizontal start - end)
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.width(64.dp)
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.width(72.dp)
             ) {
                 Text(
                     text = lecture.slot.startTime,
@@ -152,15 +159,18 @@ fun TimelineSlotCard(
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     ),
-                    color = if (isOngoing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    color = if (isOngoing) Color(0xFF15803D) else Color(0xFF0F172A)
                 )
                 Text(
                     text = lecture.slot.endTime,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    color = Color(0xFF64748B)
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Box(
                     modifier = Modifier
@@ -168,29 +178,27 @@ fun TimelineSlotCard(
                         .clip(CircleShape)
                         .background(
                             when {
-                                isOngoing -> MaterialTheme.colorScheme.primary
-                                isCompleted -> Color(0xFF10B981)
+                                isOngoing -> Color(0xFF22C55E)
+                                isCompleted -> Color(0xFF94A3B8)
                                 isCancelled -> Color(0xFFEF4444)
-                                else -> MaterialTheme.colorScheme.outlineVariant
+                                else -> Color(0xFF06B6D4)
                             }
                         )
                 )
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
-
-            // Subject bar accent
+            // Clean Accent Bar (colored by subject)
             Box(
                 modifier = Modifier
                     .width(4.dp)
-                    .height(56.dp)
+                    .height(48.dp)
                     .clip(RoundedCornerShape(2.dp))
                     .background(lecture.subject.color)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Details
+            // Details Column
             Column(modifier = Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -199,22 +207,28 @@ fun TimelineSlotCard(
                 ) {
                     Text(
                         text = lecture.subject.name,
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        ),
+                        color = Color(0xFF0F172A),
+                        modifier = Modifier.weight(1f, fill = false)
                     )
+
+                    Spacer(modifier = Modifier.width(6.dp))
 
                     // Status Pill
                     when {
                         isOngoing -> {
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.primary
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color(0xFF22C55E)
                             ) {
                                 Text(
-                                    text = "LIVE NOW",
+                                    text = "LIVE",
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
                                 )
                             }
                         }
@@ -222,21 +236,21 @@ fun TimelineSlotCard(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = "Completed",
-                                    tint = Color(0xFF10B981),
-                                    modifier = Modifier.size(14.dp)
+                                    contentDescription = "Done",
+                                    tint = Color(0xFF94A3B8),
+                                    modifier = Modifier.size(13.dp)
                                 )
                                 Spacer(modifier = Modifier.width(3.dp))
                                 Text(
                                     text = "Done",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF10B981)
+                                    color = Color(0xFF94A3B8)
                                 )
                             }
                         }
                         isCancelled -> {
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(8.dp),
                                 color = Color(0xFFEF4444)
                             ) {
                                 Text(
@@ -247,92 +261,49 @@ fun TimelineSlotCard(
                                 )
                             }
                         }
-                        else -> {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant
-                            ) {
-                                Text(
-                                    text = lecture.slot.type.name,
-                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
+                        else -> {}
                     }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Location & Faculty row
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Room click target
+                    // Room
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .clickable { onSlotRoomClick(lecture.effectiveClassroom.id) }
+                        modifier = Modifier.clickable { onSlotRoomClick(lecture.effectiveClassroom.code) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Room",
-                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = null,
+                            tint = Color(0xFF0891B2),
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = lecture.effectiveClassroom.name,
+                            text = "Room ${lecture.effectiveClassroom.code}",
                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.primary
+                            color = Color(0xFF0891B2)
                         )
                     }
 
+                    // Faculty
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Faculty",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            contentDescription = null,
+                            tint = Color(0xFF64748B),
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = lecture.effectiveFaculty.name,
+                            text = lecture.effectiveFaculty.shortCode,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = Color(0xFF64748B)
                         )
-                    }
-                }
-
-                // Change notice banner inside card if changed
-                if (lecture.isChanged && !isCancelled) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = Color(0xFFF59E0B).copy(alpha = 0.15f),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = Color(0xFFD97706),
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = lecture.changeReason ?: "Changed by Admin",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFFB45309)
-                            )
-                        }
                     }
                 }
             }

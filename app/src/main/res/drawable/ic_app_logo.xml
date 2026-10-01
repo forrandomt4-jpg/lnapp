@@ -5,17 +5,29 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Graduation Mortarboard Top (Diamond) -->
+    <!-- Squircle / Rounded Rect Background in Slate 900 -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M16,0 L92,0 C100.8,0 108,7.2 108,16 L108,92 C108,100.8 100.8,108 92,108 L16,108 C7.2,108 0,100.8 0,92 L0,16 C0,7.2 7.2,0 16,0 Z" />
+
+    <!-- Subtle Geometric Accent Rings -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1E293B"
+        android:strokeWidth="1.5"
+        android:pathData="M54,14 A40,40 0 1,1 53.9,14" />
+
+    <!-- Academic Mortarboard Top in Cyan 500 -->
     <path
         android:fillColor="#06B6D4"
         android:pathData="M54,26 L78,37 L54,48 L30,37 Z" />
 
-    <!-- Mortarboard Cap Base / Band -->
+    <!-- Mortarboard Base Band in Cyan 600 -->
     <path
         android:fillColor="#0891B2"
         android:pathData="M39,41.5 L39,49 C39,55 69,55 69,49 L69,41.5 C64,44.5 59,45.5 54,45.5 C49,45.5 44,44.5 39,41.5 Z" />
 
-    <!-- Tassel String and Hanging Knot -->
+    <!-- Tassel String and Hanging Knot in Lime 500 -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#84CC16"
@@ -26,14 +38,14 @@
         android:fillColor="#84CC16"
         android:pathData="M26.5,52 A1.5,1.5 0 1,1 29.5,52 A1.5,1.5 0 1,1 26.5,52" />
 
-    <!-- Clock / Timetable Dial Ring (Center 54, 69) -->
+    <!-- Clock / Timetable Dial Ring -->
     <path
         android:fillColor="#1E293B"
         android:strokeColor="#06B6D4"
         android:strokeWidth="2.5"
         android:pathData="M54,54 A17,17 0 1,1 53.9,54" />
 
-    <!-- Clock Tick Marks (12, 3, 6, 9) -->
+    <!-- Clock Tick Marks -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#94A3B8"
@@ -41,7 +53,7 @@
         android:strokeLineCap="round"
         android:pathData="M54,55 L54,58 M54,80 L54,83 M40,69 L43,69 M65,69 L68,69" />
 
-    <!-- Clock Hour Hand (pointing to 10:30) -->
+    <!-- Clock Hour Hand (10:30) -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#FFFFFF"
@@ -49,7 +61,7 @@
         android:strokeLineCap="round"
         android:pathData="M54,69 L47,63" />
 
-    <!-- Clock Minute Hand (pointing to 30 / 6 o'clock) -->
+    <!-- Clock Minute Hand (30 / 6 o'clock) -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#84CC16"
@@ -62,7 +74,7 @@
         android:fillColor="#FFFFFF"
         android:pathData="M52.5,69 A1.5,1.5 0 1,1 55.5,69 A1.5,1.5 0 1,1 52.5,69" />
 
-    <!-- Dynamic Pulse / Live Status Dot at top-right of the clock -->
+    <!-- Dynamic Status Pulse Dot -->
     <path
         android:fillColor="#84CC16"
         android:pathData="M67,56 A2.5,2.5 0 1,1 72,56 A2.5,2.5 0 1,1 67,56" />
